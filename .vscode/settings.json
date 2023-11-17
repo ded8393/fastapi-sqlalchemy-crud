@@ -1,0 +1,23 @@
+{
+    "[python]": {
+        "editor.formatOnSave": true,
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true,
+      },
+    },
+    "search.exclude": {
+      "**/.pnp.*": true,
+    },
+    "editor.wordBasedSuggestions": false,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.terminal.activateEnvironment": false,
+    "python.testing.pytestArgs": [],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "typescript.tsdk": ".yarn/sdks/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
+    "eslint.nodePath": ".yarn/sdks",
+  }

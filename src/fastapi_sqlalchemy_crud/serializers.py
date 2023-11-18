@@ -19,7 +19,7 @@ from sqlalchemy.orm.clsregistry import ClsRegistryToken, _ModuleMarker
 
 PydanticFieldDecl: TypeAlias = tuple[type | UnionType | ForwardRef | None, EllipsisType | None]
 
-SYNTH_MODULE = "_boh_app_synth"
+SYNTH_MODULE = "_fsc_synth"
 
 
 def setup_schema(decl_base: type[DeclarativeBase], *, session: Session) -> None:

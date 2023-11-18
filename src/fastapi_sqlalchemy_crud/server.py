@@ -2,19 +2,19 @@ from typing import Any
 
 import rich.traceback
 from fastapi import Depends, FastAPI, HTTPException, Response, status
-from fastapi.middleware import Middleware
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+
+# from fastapi.middleware import Middleware
+# from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import DeclarativeBase, Session
 
 from .database import get_sess, init_db
-from .models import Base
 
 rich.traceback.install()
 
 app = FastAPI()
 
-cors = Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-app.user_middleware.insert(0, cors)
+# cors = Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# app.user_middleware.insert(0, cors)
 
 
 @app.get("/")
@@ -22,16 +22,16 @@ async def root():
     return {"message": "Hello World"}
 
 
-def update_model(model: Base, item: Base, data: dict[str, Any], session: Session):
+def update_model(model: type[DeclarativeBase], item: type[DeclarativeBase], data: dict[str, Any], session: Session):
     # marshmallow loads nested items as model objects, which can be set on model
     serializer = model.__marshmallow__(session=session)
-    m_item: Base = serializer.load(data)
+    m_item: type[DeclarativeBase] = serializer.load(data)
     for field in data:
         setattr(item, field, getattr(m_item, field))
     return item
 
 
-def register_model(table_name: str, model: type[Base]):
+def register_model(table_name: str, model: type[DeclarativeBase]):
     @app.get(
         f"/{table_name}",
         response_model=list[model.__pydantic__],
@@ -67,7 +67,7 @@ def register_model(table_name: str, model: type[Base]):
     ):
         with session.begin():
             serializer = model.__marshmallow__(session=session)
-            item: Base = serializer.load(data.model_dump())
+            item: type[DeclarativeBase] = serializer.load(data.model_dump())
             session.add(item)
             session.flush()
             resp = model.__pydantic__.model_validate(item)
@@ -124,6 +124,8 @@ def register_model(table_name: str, model: type[Base]):
         return resp
 
 
-table_name2model = init_db()
-for table_name, model in table_name2model.items():
-    register_model(table_name, model)
+def init_server(base: type[DeclarativeBase]):
+    table_name2model = init_db(base)
+    for table_name, model in table_name2model.items():
+        register_model(table_name, model)
+    return app
